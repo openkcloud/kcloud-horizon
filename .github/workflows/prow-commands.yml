@@ -45,4 +45,4 @@ jobs:
             /hold 
             /cc 
             /uncc'
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: "${{ secrets.CR_PAT }}"
