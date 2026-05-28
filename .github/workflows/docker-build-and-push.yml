@@ -24,9 +24,14 @@ jobs:
       PROJECT_REF: kcloud/2024.1
       IMAGE_NAME: ${{ github.event.repository.name }}
       IMAGE_TAG: kcloud-2024.1
-      DIST_PACKAGES: 
+      DIST_PACKAGES:
       PROFILES: fluent apache
-      PIP_PACKAGES: pymemcache
+      PIP_PACKAGES: >-
+        pymemcache
+        magnum-ui
+        octavia-dashboard
+        git+https://github.com/openkcloud/kcloud-cyborg-dashboard@kcloud/2024.1
+      HORIZON_EXTRA_PANELS: magnum_ui octavia_dashboard cyborg_dashboard
 
     steps:
       - name: Checkout Horizon source
@@ -107,7 +112,8 @@ jobs:
             --build-arg PROJECT_REPO=${{ env.PROJECT_REPO }} \
             --build-arg PROJECT_REF=${{ env.PROJECT_REF }} \
             --build-arg PROFILES='${{ env.PROFILES }}' \
-            --build-arg PIP_PACKAGES=${{ env.PIP_PACKAGES }} \
+            --build-arg PIP_PACKAGES='${{ env.PIP_PACKAGES }}' \
+            --build-arg HORIZON_EXTRA_PANELS='${{ env.HORIZON_EXTRA_PANELS }}' \
             --build-arg KEEP_ALL_WHEELS=yes \
             --tag ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
             kcloud-loci
