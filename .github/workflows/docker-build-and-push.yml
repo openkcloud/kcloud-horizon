@@ -19,7 +19,7 @@ jobs:
       REQUIREMENTS_IMAGE_NAME: kcloud-requirements
       REQUIREMENTS_IMAGE_TAG: kcloud-2024.1-ubuntu_jammy
       REQUIREMENTS_REF: kcloud/2024.1
-      PROJECT: cyborg
+      PROJECT: horizon
       PROJECT_REPO: https://github.com/${{ github.repository }}
       PROJECT_REF: kcloud/2024.1
       IMAGE_NAME: ${{ github.event.repository.name }}
