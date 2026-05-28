@@ -1,0 +1,13 @@
+# Constraints for pip's PEP 517 isolated build environments
+# (referenced from tox.ini via PIP_CONSTRAINT).
+#
+# We can't point PIP_CONSTRAINT at kcloud-requirements/upper-constraints.txt
+# directly because pip splits PIP_CONSTRAINT values on os.pathsep (':' on
+# POSIX), which mangles URLs like https://... — see pypa/pip#11953.
+# So build-time pins live in this local file.
+#
+# setuptools>=81 dropped pkg_resources from the default wheel, breaking
+# old sdist-only XStatic packages (e.g. XStatic-Angular-Schema-Form
+# 0.8.13.0) whose setup.py still imports pkg_resources.declare_namespace
+# at build time.
+setuptools<81
