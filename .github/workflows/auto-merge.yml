@@ -63,6 +63,12 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.CR_PAT }}"
           MERGE_LABELS: "approved,!wip,!hold"
+          # Without this the action exits 0 even when the merge was rejected,
+          # so the job shows green while the PR stays open and nothing says
+          # why. Surfacing it matters here because CR_PAT cannot merge a PR
+          # that touches .github/workflows/ unless it carries the 'workflow'
+          # scope, and that failure is otherwise only visible in the log.
+          MERGE_ERROR_FAIL: "true"
           MERGE_REMOVE_LABELS: ""
           MERGE_METHOD: "merge"
           MERGE_COMMIT_MESSAGE: "pull-request-title"
