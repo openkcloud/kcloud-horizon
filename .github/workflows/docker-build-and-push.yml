@@ -26,12 +26,42 @@ jobs:
       IMAGE_TAG: kcloud-2024.1
       DIST_PACKAGES:
       PROFILES: fluent apache
+      # Dashboards must be direct VCS references, not plain names. The image
+      # build runs with KEEP_ALL_WHEELS=yes, which makes loci pass --no-index,
+      # so named requirements resolve only against the pre-built wheelhouse --
+      # and that wheelhouse is generated from upper-constraints.txt, which does
+      # not carry Horizon plugins. Direct URLs bypass the index entirely.
+      #
+      # Each plugin tracks the release of the service it drives, not Horizon's:
+      #   heat    2024.1 (rackerlabs-heat:2024.1)        -> heat-dashboard 2024.1
+      #   octavia 2024.1 (rackerlabs-octavia-ovn:2024.1) -> octavia-dashboard 2024.1
+      #   magnum  2025.1 (genestack-images/magnum:2025.1)-> magnum-ui 16.0.0
+      #
+      # heat/octavia use the 2024.1-eom tag because their stable/2024.1
+      # branches were deleted at end of maintenance. magnum-ui's stable/2025.1
+      # is still open, so pin the 16.0.0 release tag rather than the moving
+      # branch to keep image builds reproducible.
+      #
+      # Resolved versions: heat-dashboard 11.0.1.dev2 / magnum-ui 16.0.0
+      #                    octavia-dashboard 13.0.2.dev1
       PIP_PACKAGES: >-
         pymemcache
-        magnum-ui
-        octavia-dashboard
+        git+https://opendev.org/openstack/heat-dashboard@2024.1-eom
+        git+https://opendev.org/openstack/magnum-ui@16.0.0
+        git+https://opendev.org/openstack/octavia-dashboard@2024.1-eom
         git+https://github.com/openkcloud/kcloud-cyborg-dashboard@kcloud/2024.1
-      HORIZON_EXTRA_PANELS: magnum_ui octavia_dashboard cyborg_dashboard
+      # Panel registration is done at runtime by the openstack-helm horizon
+      # chart (conf.horizon.extra_panels), not at build time. Both create the
+      # same symlinks under openstack_dashboard/local/enabled/ with a bare
+      # `ln -s` under `set -e`, so doing both makes horizon.sh fail with
+      # "File exists" before apache starts -> CrashLoopBackOff.
+      #
+      # This must be a non-empty sentinel, not empty and not removed: loci's
+      # 01_configure_horizon.sh uses ${HORIZON_EXTRA_PANELS:-<long default>},
+      # so an unset or empty value silently restores its default list (which
+      # includes octavia_dashboard, installed below) and reintroduces the
+      # collision. 'none' matches no installed package, so the loop is a no-op.
+      HORIZON_EXTRA_PANELS: none
 
     steps:
       - name: Checkout Horizon source
