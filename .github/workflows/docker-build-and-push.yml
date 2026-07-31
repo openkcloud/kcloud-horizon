@@ -35,19 +35,18 @@ jobs:
       # Each plugin tracks the release of the service it drives, not Horizon's:
       #   heat    2024.1 (rackerlabs-heat:2024.1)        -> heat-dashboard 2024.1
       #   octavia 2024.1 (rackerlabs-octavia-ovn:2024.1) -> octavia-dashboard 2024.1
-      #   magnum  2025.1 (genestack-images/magnum:2025.1)-> magnum-ui 16.0.0
+      #   magnum  2025.1 (genestack-images/magnum:2025.1)-> kcloud-magnum-ui
       #
       # heat/octavia use the 2024.1-eom tag because their stable/2024.1
-      # branches were deleted at end of maintenance. magnum-ui's stable/2025.1
-      # is still open, so pin the 16.0.0 release tag rather than the moving
-      # branch to keep image builds reproducible.
+      # branches were deleted at end of maintenance. magnum-ui is carried as a
+      # kcloud fork (based on 2024.1-eom / the 16.0.0 line) so kcloud changes
+      # can be applied, mirroring kcloud-cyborg-dashboard.
       #
-      # Resolved versions: heat-dashboard 11.0.1.dev2 / magnum-ui 16.0.0
-      #                    octavia-dashboard 13.0.2.dev1
+      # Resolved versions: heat-dashboard 11.0.1.dev2 / octavia-dashboard 13.0.2.dev1
       PIP_PACKAGES: >-
         pymemcache
         git+https://opendev.org/openstack/heat-dashboard@2024.1-eom
-        git+https://opendev.org/openstack/magnum-ui@16.0.0
+        git+https://github.com/openkcloud/kcloud-magnum-ui@kcloud/2024.1
         git+https://opendev.org/openstack/octavia-dashboard@2024.1-eom
         git+https://github.com/openkcloud/kcloud-cyborg-dashboard@kcloud/2024.1
       # Panel registration is done at runtime by the openstack-helm horizon
